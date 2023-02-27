@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import IServiceTeam from '../api/interfaces/IServiceTeam';
+import IServiceTeam from '../interfaces/IServiceTeam';
 
 export default class TeamController {
   private _service: IServiceTeam;
