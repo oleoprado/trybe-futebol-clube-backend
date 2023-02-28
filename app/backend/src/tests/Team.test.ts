@@ -20,7 +20,7 @@ describe('Testes para a rota TEAMS', function () {
 
   it('Metodo GET: Deve retornar todos os teams cadastrados', async function () {
     const outputMock: Team[] = [{ id: 1, teamName: 'Avaí/Kindermann'}] as Team[];
-    Sinon.stub(Model, 'findAll').resolves(outputMock);
+    Sinon.stub(Team, 'findAll').resolves(outputMock);
     const result = await chai.request(app).get('/teams');
     expect(result.status).to.be.equal(200);
     expect(result.body).to.be.deep.equal(outputMock);
@@ -29,7 +29,7 @@ describe('Testes para a rota TEAMS', function () {
   it('Metodo GET: Deve retornar o time correspondente ao ID informado', async function(){
     const reqParamsMock = 4;
     const outputMock: Team = {id: 4, teamName: 'Corinthians'} as Team;
-    Sinon.stub(Model, 'findByPk').resolves(outputMock);
+    Sinon.stub(Team, 'findByPk').resolves(outputMock);
 
     const result = await chai.request(app).get(`/teams/${reqParamsMock}`);
 

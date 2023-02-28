@@ -19,7 +19,6 @@ export default class UserService implements IServiceUser {
   async login(dto: ILogin): Promise<IJwt> {
     const { email, password } = dto;
     const user = await this._validateLogin(email);
-    // const user = await this.model.findOne({ where: { email } }) as User;
 
     const validPassword = bcrypt.compareSync(password, user.password);
     if (!validPassword) throw new InvalidField('Invalid email or password');
