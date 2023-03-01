@@ -1,6 +1,7 @@
 import * as express from 'express';
 import teamRoutes from './api/routes/TeamRoutes';
 import userRoutes from './api/routes/UserRoutes';
+import matchRoutes from './api/routes/MatchRoutes';
 import ErrorHandler from './api/middlewares/ErrorHandler';
 
 class App {
@@ -31,6 +32,7 @@ class App {
   private initRoutes(): void {
     this.app.use(teamRoutes);
     this.app.use(userRoutes);
+    this.app.use(matchRoutes);
   }
 
   private initMiddleware(): void {

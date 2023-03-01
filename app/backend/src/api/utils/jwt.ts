@@ -7,7 +7,7 @@ const jwtConfig: jwt.SignOptions = {
   algorithm: 'HS256',
 };
 
-interface IPayload {
+export interface IPayload {
   email: string;
 }
 
