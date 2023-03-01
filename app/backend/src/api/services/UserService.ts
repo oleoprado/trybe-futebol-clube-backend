@@ -18,18 +18,22 @@ export default class UserService implements IServiceUser {
 
   async login(dto: ILogin): Promise<IJwt> {
     const { email, password } = dto;
-    const user = await this._validateLogin(email);
 
-    const validPassword = bcrypt.compareSync(password, user.password);
-    if (!validPassword) throw new InvalidField('Invalid email or password');
-
+    const user = await this._validateIfUserExist(email);
+    await UserService._validateUserPassword(password, user.password);
     const token = JWT.generateToken({ email });
+
     return token as unknown as IJwt;
   }
 
-  private async _validateLogin(email: string): Promise<User> {
+  private async _validateIfUserExist(email: string): Promise<User> {
     const user = await this.model.findOne({ where: { email } });
     if (!user) throw new NotFoundError('User not found');
     return user;
+  }
+
+  static async _validateUserPassword(password: string, userPassword: string): Promise<void> {
+    const validPassword = bcrypt.compareSync(password, userPassword);
+    if (!validPassword) throw new InvalidField('Invalid email or password');
   }
 }
