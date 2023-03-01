@@ -12,4 +12,16 @@ export default class MatchService implements IServiceMatch {
       { model: Team, as: 'awayTeam', attributes: { exclude: ['id'] } },
     ] });
   }
+
+  async readAllInProgress(query: string): Promise<Match[]> {
+    const inProgress = JSON.parse(query);
+
+    return this.model.findAll({
+      include: [
+        { model: Team, as: 'homeTeam', attributes: { exclude: ['id'] } },
+        { model: Team, as: 'awayTeam', attributes: { exclude: ['id'] } },
+      ],
+      where: { inProgress },
+    });
+  }
 }
