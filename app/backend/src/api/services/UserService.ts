@@ -8,6 +8,7 @@ import ILogin from '../interfaces/ILogin';
 import IServiceUser from '../interfaces/IServiceUser';
 import Jwt from '../utils/jwt';
 import InvalidField from '../errors/invalidField';
+import IRole from '../interfaces/IRole';
 
 const JWT = new Jwt();
 
@@ -21,6 +22,12 @@ export default class UserService implements IServiceUser {
     const token = JWT.generateToken({ email });
 
     return token as unknown as IJwt;
+  }
+
+  async getUserRole(email: string): Promise<IRole> {
+    const user = await this.model.findOne({ where: { email } });
+    const role = user?.role;
+    return role as unknown as IRole;
   }
 
   protected async _validateUser(email: string, password: string): Promise<void> {

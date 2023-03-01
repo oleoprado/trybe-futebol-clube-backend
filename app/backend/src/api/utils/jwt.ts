@@ -1,5 +1,7 @@
 import 'dotenv/config';
 import * as jwt from 'jsonwebtoken';
+import InvalidField from '../errors/invalidField';
+import BadRequest from '../errors/badRequest';
 
 const jwtConfig: jwt.SignOptions = {
   algorithm: 'HS256',
@@ -13,26 +15,26 @@ class Jwt {
   private _secret = process.env.JWT_SECRET;
 
   generateToken(payload: IPayload) {
-    if (!this._secret) throw new Error('JWT secret is not defined');
+    if (!this._secret) throw new InvalidField('JWT secret is not defined');
 
     try {
       return jwt.sign(payload, this._secret, jwtConfig);
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error('failed to generate token');
+        throw new BadRequest('failed to generate token');
       }
     }
   }
 
   decodeToken(token: string) {
-    if (!token) throw new Error('Token not found');
-    if (!this._secret) throw new Error('JWT secret is not defined');
+    if (!token) throw new InvalidField('Token not found');
+    if (!this._secret) throw new InvalidField('JWT secret is not defined');
 
     try {
       return jwt.verify(token, this._secret);
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(error.message);
+        throw new InvalidField('Token must be a valid token');
       }
     }
   }
