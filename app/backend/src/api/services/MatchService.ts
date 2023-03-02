@@ -1,7 +1,8 @@
 import { ModelStatic } from 'sequelize';
 import Team from '../../database/models/Team';
 import Match from '../../database/models/Match';
-import IServiceMatch from '../interfaces/IServiceMatch';
+import IServiceMatch, { IFinished } from '../interfaces/IServiceMatch';
+import NotFoundError from '../errors/notFoundError';
 
 export default class MatchService implements IServiceMatch {
   protected model: ModelStatic<Match> = Match;
@@ -23,5 +24,12 @@ export default class MatchService implements IServiceMatch {
       ],
       where: { inProgress },
     });
+  }
+
+  async endMatches(id: number): Promise<IFinished> {
+    const match = await this.model.findOne({ where: { id } });
+    if (!match) throw new NotFoundError('Match not found');
+    await this.model.update({ inProgress: false }, { where: { id } });
+    return { message: 'Finished' };
   }
 }

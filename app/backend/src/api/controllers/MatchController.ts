@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import IServiceMatch from '../interfaces/IServiceMatch';
 
 export default class MatchController {
@@ -18,5 +18,15 @@ export default class MatchController {
 
     const matches = await this._service.readAll();
     return res.status(200).json(matches);
+  }
+
+  async endMatches(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const message = await this._service.endMatches(Number(id));
+      return res.status(200).json(message);
+    } catch (error) {
+      next(error);
+    }
   }
 }

@@ -9,7 +9,7 @@ export default class Auth {
     const { authorization } = req.headers;
     if (!authorization) throw new InvalidField('Token not found');
     const decoded = JWT.decodeToken(authorization);
-    if (decoded instanceof Error) throw new InvalidField('Invalid token');
+    if (decoded instanceof Error) throw new InvalidField('Token must be a valid token');
 
     req.body = decoded;
     next();
