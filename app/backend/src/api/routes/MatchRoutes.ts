@@ -10,6 +10,8 @@ const matchController = new MatchController(matchService);
 matchRoutes
   .get('/matches', (req: Request, res: Response) => matchController.readAll(req, res))
   .patch('/matches/:id/finish', Auth.auth, (req: Request, res: Response, next: NextFunction) =>
-    matchController.endMatches(req, res, next));
+    matchController.endMatches(req, res, next))
+  .patch('/matches/:id', Auth.auth, (req: Request, res: Response, next: NextFunction) =>
+    matchController.updateGoals(req, res, next));
 
 export default matchRoutes;
