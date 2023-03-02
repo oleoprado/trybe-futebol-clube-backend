@@ -40,9 +40,8 @@ export default class MatchService implements IServiceMatch {
     const match = await this.model.findOne({ where: { id } });
     if (!match) throw new NotFoundError('Match not found');
 
-    if (match.inProgress) {
-      await this.model.update({ homeTeamGoals, awayTeamGoals }, { where: { id } });
-    }
+    await this.model.update({ homeTeamGoals, awayTeamGoals }, { where: { id } });
+
     return { message: 'Goals updated successfully' };
   }
 
