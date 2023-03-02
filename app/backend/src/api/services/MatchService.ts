@@ -3,6 +3,7 @@ import Team from '../../database/models/Team';
 import Match from '../../database/models/Match';
 import IServiceMatch, { IMessage, IUpdateGoals } from '../interfaces/IServiceMatch';
 import NotFoundError from '../errors/notFoundError';
+import IMatch from '../interfaces/IMatch';
 
 export default class MatchService implements IServiceMatch {
   protected model: ModelStatic<Match> = Match;
@@ -42,5 +43,18 @@ export default class MatchService implements IServiceMatch {
       await this.model.update({ homeTeamGoals, awayTeamGoals }, { where: { id } });
     }
     return { message: 'Goals updated successfully' };
+  }
+
+  async create(dto: IMatch): Promise<IMatch> {
+    const { homeTeamId, homeTeamGoals, awayTeamId, awayTeamGoals } = dto;
+    const { id } = await this.model.create({
+      homeTeamId,
+      homeTeamGoals,
+      awayTeamId,
+      awayTeamGoals,
+      inProgress: true,
+    });
+    const match = await this.model.findByPk(id);
+    return match as IMatch;
   }
 }

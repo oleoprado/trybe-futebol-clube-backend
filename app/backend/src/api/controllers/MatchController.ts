@@ -40,4 +40,10 @@ export default class MatchController {
       next(error);
     }
   }
+
+  async create(req: Request, res: Response) {
+    const match = await this._service.create(req.body);
+
+    return res.status(201).json(match);
+  }
 }

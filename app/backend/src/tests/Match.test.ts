@@ -4,6 +4,7 @@ import * as Sinon from 'sinon';
 import chaiHttp = require('chai-http');
 import { app } from '../../src/app';
 import Match from '../database/models/Match';
+import IMatch from '../api/interfaces/IMatch';
 import { Model } from 'sequelize';
 
 const { expect } = chai;
@@ -101,4 +102,35 @@ describe('Testes para a rota MATCH', function () {
     expect(response.status).to.be.equal(200)
     expect(response.body).to.be.deep.equal(outputMock);
   });
+
+  it('Metodo POST: Deve cadastrar uma nova partida em andamento com sucesso', async function() {
+    const login = { email: 'admin@admin.com', password: 'secret_admin'};
+    const inputMock: IMatch = {
+      "homeTeamId": 16, 
+      "awayTeamId": 8, 
+      "homeTeamGoals": 2,
+      "awayTeamGoals": 2,
+    }
+    const outputMock: Match = {
+      "id": 1,
+      "homeTeamId": 16,
+      "homeTeamGoals": 2,
+      "awayTeamId": 8,
+      "awayTeamGoals": 2,
+      "inProgress": true,
+    } as Match
+
+    const responseLogin = await chai.request(app).post('/login').send(login);
+    expect(responseLogin.body.token).not.to.be.empty;
+    const token: string = responseLogin.body.token;
+
+    Sinon.stub(Model, 'create').resolves();
+    Sinon.stub(Model, 'findByPk').resolves(outputMock);
+    const response = await chai.request(app).post('/matches').send(inputMock).set('authorization', token);
+    console.log('response ===>', response.body);
+    
+
+    expect(response.status).to.be.equal(201);
+    expect(response.body).to.be.deep.equal(outputMock);
+  })
 })
