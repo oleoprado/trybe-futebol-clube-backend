@@ -65,19 +65,5 @@ export default class MatchService implements IServiceMatch {
       awayTeamGoals,
       inProgress: true,
     });
-    // const match = await this.model.findByPk(id);
-    // return match as IMatch;
   }
-
-  // private async _validateTeams(homeTeamId: number, awayTeamId: number) {
-  //   const homeTeamExist = await this.model.findByPk(homeTeamId);
-  //   const awayTeamExist = await this.model.findByPk(awayTeamId);
-
-  //   if (!homeTeamExist || !awayTeamExist) {
-  //     throw new NotFoundError('There is no team with such id!');
-  //   }
-  //   if (homeTeamId === awayTeamId) {
-  //     throw new UnprocessableError('It is not possible to create a match with two equal teams');
-  //   }
-  // }
 }
