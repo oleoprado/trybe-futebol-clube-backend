@@ -13,6 +13,7 @@ matchRoutes
     matchController.endMatches(req, res, next))
   .patch('/matches/:id', Auth.auth, (req: Request, res: Response, next: NextFunction) =>
     matchController.updateGoals(req, res, next))
-  .post('/matches', Auth.auth, (req: Request, res: Response) => matchController.create(req, res));
+  .post('/matches', Auth.auth, (req: Request, res: Response, next: NextFunction) =>
+    matchController.create(req, res, next));
 
 export default matchRoutes;
