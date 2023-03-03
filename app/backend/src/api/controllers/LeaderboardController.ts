@@ -9,7 +9,12 @@ export default class LeaderboardController {
   }
 
   async homeTeam(_req: Request, res: Response) {
-    const results = await this._service.teamsPerformace();
+    const results = await this._service.homeTeamsPerformace();
+    return res.status(200).json(results);
+  }
+
+  async awayTeam(_req: Request, res: Response) {
+    const results = await this._service.awayTeamsPerformace();
     return res.status(200).json(results);
   }
 }
