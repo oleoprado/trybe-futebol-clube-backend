@@ -7,6 +7,8 @@ const leaderboardService = new LeaderboardService();
 const leaderboardController = new LeaderboardController(leaderboardService);
 
 leaderboardRoutes
+  .get('/leaderboard', (req: Request, res: Response) =>
+    leaderboardController.classificacao(req, res))
   .get('/leaderboard/home', (req: Request, res: Response) =>
     leaderboardController.homeTeam(req, res))
   .get('/leaderboard/away', (req: Request, res: Response) =>
