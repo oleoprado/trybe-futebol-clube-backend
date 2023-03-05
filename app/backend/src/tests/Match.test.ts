@@ -4,9 +4,7 @@ import * as Sinon from 'sinon';
 import chaiHttp = require('chai-http');
 import { app } from '../../src/app';
 import Match from '../database/models/Match';
-import IMatch from '../api/interfaces/IMatch';
 import { Model } from 'sequelize';
-import Team from '../database/models/Team';
 import {
   matchesList,
   validLogin,
