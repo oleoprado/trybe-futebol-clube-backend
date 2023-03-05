@@ -29,18 +29,14 @@ export default class MatchService implements IServiceMatch {
   }
 
   async endMatches(id: number): Promise<IMessage> {
-    const match = await this.model.findOne({ where: { id } });
-    if (!match) throw new NotFoundError('Match not found');
+    await this._verifyIfExistMatch(id);
     await this.model.update({ inProgress: false }, { where: { id } });
     return { message: 'Finished' };
   }
 
   async updateGoals(id: number, dto: IUpdateGoals): Promise<IMessage> {
-    const { homeTeamGoals, awayTeamGoals } = dto;
-    const match = await this.model.findOne({ where: { id } });
-    if (!match) throw new NotFoundError('Match not found');
-
-    await this.model.update({ homeTeamGoals, awayTeamGoals }, { where: { id } });
+    await this._verifyIfExistMatch(id);
+    await this.model.update({ ...dto }, { where: { id } });
 
     return { message: 'Goals updated successfully' };
   }
@@ -64,6 +60,11 @@ export default class MatchService implements IServiceMatch {
       awayTeamGoals,
       inProgress: true,
     });
+  }
+
+  private async _verifyIfExistMatch(id: number): Promise<void> {
+    const match = await this.model.findOne({ where: { id } });
+    if (!match) throw new NotFoundError('Match not found');
   }
 }
 //
