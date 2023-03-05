@@ -7,251 +7,136 @@ import Match from '../database/models/Match';
 import IMatch from '../api/interfaces/IMatch';
 import { Model } from 'sequelize';
 import Team from '../database/models/Team';
+import {
+  matchesList,
+  validLogin,
+  validMatchId,
+  match,
+  finished,
+  goalsUpdated,
+  invalidMatchId,
+  matchNotFound,
+  validCreateMatch,
+  outputCreateMatch,
+  invalidCreateMatch,
+  teamsNotFound,
+  invalidEqualTeams,
+  team,
+  teamsNotPossibleCreate,
+  matchesInProgressList,
+  tokenNotFound,
+} from './mocks/matchMocks';
 
 const { expect } = chai;
 chai.use(chaiHttp);
 
 describe('Testes para a rota MATCH', function () {
+  const authenticate = async function() {
+    const responseLogin = await chai.request(app).post('/login').send(validLogin);
+    expect(responseLogin.body.token).not.to.be.empty;
+    return responseLogin.body.token;
+  }
+
   afterEach(function () {
     Sinon.restore();
   });
 
   it('Metodo GET: Deve retornar uma lista com todas as partidas', async function () {
-    const outputMock: Match[] = [
-      {
-        "id": 1,
-        "homeTeamId": 16,
-        "homeTeamGoals": 1,
-        "awayTeamId": 8,
-        "awayTeamGoals": 1,
-        "inProgress": false,
-        "homeTeam": {
-          "teamName": "São Paulo"
-        },
-        "awayTeam": {
-          "teamName": "Grêmio"
-        }
-      },
-    ] as unknown as Match[];
-
-    Sinon.stub(Model, 'findAll').resolves(outputMock);
-
+    Sinon.stub(Model, 'findAll').resolves(matchesList);
     const result = await chai.request(app).get('/matches');
 
     expect(result.status).to.be.equal(200);
-    expect(result.body).to.be.deep.equal(outputMock);
+    expect(result.body).to.be.deep.equal(matchesList);
   });
 
   it('Metodo PATCH: Deve finalizar uma partida com sucesso', async function () {
-    const login = { email: 'admin@admin.com', password: 'secret_admin' };
-    const idMock = 1;
-    const matchMock: Match = {
-      "id": 1,
-      "homeTeamId": 16,
-      "homeTeamGoals": 1,
-      "awayTeamId": 8,
-      "awayTeamGoals": 1,
-      "inProgress": true,
-      "homeTeam": {
-        "teamName": "São Paulo"
-      },
-      "awayTeam": {
-        "teamName": "Grêmio"
-      }
-    } as unknown as Match;
-    const outputMock = { message: 'Finished' };
+    const token: string = await authenticate();
 
-    const responseLogin = await chai.request(app).post('/login').send(login);
-    expect(responseLogin.body.token).not.to.be.empty;
-    const token: string = responseLogin.body.token;
-
-    Sinon.stub(Model, 'findOne').resolves(matchMock);
+    Sinon.stub(Model, 'findOne').resolves(match);
     Sinon.stub(Match, 'update').resolves();
-    const response = await chai.request(app).patch(`/matches/${idMock}/finish`).set('authorization', token);
+    const response = await chai.request(app).patch(`/matches/${validMatchId}/finish`).set('authorization', token);
 
     expect(response.status).to.be.equal(200)
-    expect(response.body).to.be.deep.equal(outputMock);
+    expect(response.body).to.be.deep.equal(finished);
   });
 
   it('Metodo PATCH: Deve atualizar o resultado de uma partida em andamento com sucesso', async function () {
-    const login = { email: 'admin@admin.com', password: 'secret_admin' };
-    const idMock = 1;
-    const matchMock: Match = {
-      "id": 1,
-      "homeTeamId": 16,
-      "homeTeamGoals": 1,
-      "awayTeamId": 8,
-      "awayTeamGoals": 1,
-      "inProgress": true,
-      "homeTeam": {
-        "teamName": "São Paulo"
-      },
-      "awayTeam": {
-        "teamName": "Grêmio"
-      }
-    } as unknown as Match;
-    const outputMock = { message: 'Goals updated successfully' };
+    const token: string = await authenticate();
 
-    const responseLogin = await chai.request(app).post('/login').send(login);
-    expect(responseLogin.body.token).not.to.be.empty;
-    const token: string = responseLogin.body.token;
-
-    Sinon.stub(Model, 'findOne').resolves(matchMock);
+    Sinon.stub(Model, 'findOne').resolves(match);
     Sinon.stub(Match, 'update').resolves();
-    const response = await chai.request(app).patch(`/matches/${idMock}`).set('authorization', token);
+    const response = await chai.request(app).patch(`/matches/${validMatchId}`).set('authorization', token);
 
     expect(response.status).to.be.equal(200)
-    expect(response.body).to.be.deep.equal(outputMock);
+    expect(response.body).to.be.deep.equal(goalsUpdated);
   });
 
   it('Metodo PATCH: Deve retornar 404 caso não encontre a partida para atualizar o placar', async function () {
-    const login = { email: 'admin@admin.com', password: 'secret_admin' };
-    const idMock = 999;
-    const outputMock = { message: 'Match not found' };
-
-    const responseLogin = await chai.request(app).post('/login').send(login);
-    expect(responseLogin.body.token).not.to.be.empty;
-    const token: string = responseLogin.body.token;
+    const token: string = await authenticate();
 
     Sinon.stub(Model, 'findOne').resolves(null);
- 
-    const response = await chai.request(app).patch(`/matches/${idMock}`).set('authorization', token);
+    const response = await chai.request(app).patch(`/matches/${invalidMatchId}`).set('authorization', token);
 
     expect(response.status).to.be.equal(404)
-    expect(response.body).to.be.deep.equal(outputMock);
+    expect(response.body).to.be.deep.equal(matchNotFound);
   });
 
   it('Metodo POST: Deve cadastrar uma nova partida em andamento com sucesso', async function () {
-    const login = { email: 'admin@admin.com', password: 'secret_admin' };
-    const inputMock: IMatch = {
-      "homeTeamId": 16,
-      "awayTeamId": 8,
-      "homeTeamGoals": 2,
-      "awayTeamGoals": 2,
-    }
-    const outputMock: Match = {
-      "id": 1,
-      "homeTeamId": 16,
-      "homeTeamGoals": 2,
-      "awayTeamId": 8,
-      "awayTeamGoals": 2,
-      "inProgress": true,
-    } as Match
+    const token: string = await authenticate();
 
-    const responseLogin = await chai.request(app).post('/login').send(login);
-    expect(responseLogin.body.token).not.to.be.empty;
-    const token: string = responseLogin.body.token;
+    Sinon.stub(Model, 'create').resolves(outputCreateMatch);
 
-    Sinon.stub(Model, 'create').resolves(outputMock);
-
-    const response = await chai.request(app).post('/matches').send(inputMock).set('authorization', token);
+    const response = await chai.request(app).post('/matches').send(validCreateMatch).set('authorization', token);
 
     expect(response.status).to.be.equal(201);
-    expect(response.body).to.be.deep.equal(outputMock);
+    expect(response.body).to.be.deep.equal(outputCreateMatch);
   });
 
   it('Metodo POST: Deve retornar um 404 caso os times não estejam cadastrados', async function () {
-    const login = { email: 'admin@admin.com', password: 'secret_admin' };
-    const inputMock: IMatch = {
-      "homeTeamId": 999,
-      "awayTeamId": 420,
-      "homeTeamGoals": 2,
-      "awayTeamGoals": 2,
-    }
-    const outputMock = { message: 'There is no team with such id!' };
-
-    const responseLogin = await chai.request(app).post('/login').send(login);
-    expect(responseLogin.body.token).not.to.be.empty;
-    const token: string = responseLogin.body.token;
+    const token: string = await authenticate();;
 
     Sinon.stub(Model, 'findByPk').resolves(null);
-
-    const response = await chai.request(app).post('/matches').send(inputMock).set('authorization', token);
+    const response = await chai.request(app).post('/matches').send(invalidCreateMatch).set('authorization', token);
 
     expect(response.status).to.be.equal(404);
-    expect(response.body).to.be.deep.equal(outputMock);
+    expect(response.body).to.be.deep.equal(teamsNotFound);
   });
 
   it('Metodo POST: Deve retornar um 422 caso os times sejam iguais', async function () {
-    const login = { email: 'admin@admin.com', password: 'secret_admin' };
-    const inputMock: IMatch = {
-      "homeTeamId": 1,
-      "awayTeamId": 1,
-      "homeTeamGoals": 2,
-      "awayTeamGoals": 2,
-    }
-    const outputTeam: Team = {id: 4, teamName: 'Corinthians'} as Team;
+    const token: string = await authenticate();
 
-    const outputMock = { message: 'It is not possible to create a match with two equal teams' };
-
-    const responseLogin = await chai.request(app).post('/login').send(login);
-    expect(responseLogin.body.token).not.to.be.empty;
-    const token: string = responseLogin.body.token;
-
-    Sinon.stub(Model, 'findByPk').resolves(outputTeam);
-
-    const response = await chai.request(app).post('/matches').send(inputMock).set('authorization', token);  
+    Sinon.stub(Model, 'findByPk').resolves(team);
+    const response = await chai.request(app).post('/matches').send(invalidEqualTeams).set('authorization', token);  
 
     expect(response.status).to.be.equal(422);
-    expect(response.body).to.be.deep.equal(outputMock);
+    expect(response.body).to.be.deep.equal(teamsNotPossibleCreate);
   });
 
   it('Metodo POST: Deve retornar um status 401 caso o token não seja valido ao cadastrar uma partida', async function () {
-    const inputMock: IMatch = {
-      "homeTeamId": 16,
-      "awayTeamId": 8,
-      "homeTeamGoals": 2,
-      "awayTeamGoals": 2,
-    }
-    const outputMock: Match = {
-      "id": 1,
-      "homeTeamId": 16,
-      "homeTeamGoals": 2,
-      "awayTeamId": 8,
-      "awayTeamGoals": 2,
-      "inProgress": true,
-    } as Match
-    const messageMock = { message: "Token not found" }
-    Sinon.stub(Model, 'create').resolves(outputMock);
-    const response = await chai.request(app).post('/matches').send(inputMock);
+    Sinon.stub(Model, 'create').resolves(outputCreateMatch);
+    const response = await chai.request(app).post('/matches').send(validCreateMatch);
+
     expect(response.status).to.be.equal(401);
-    expect(response.body).to.be.deep.equal(messageMock);
+    expect(response.body).to.be.deep.equal(tokenNotFound);
   })
 
   it('Metodo GET: Deve retornar uma lista de matches inProgress true', async function() {
-    const login = { email: 'admin@admin.com', password: 'secret_admin'};
-    const outputMock: Match[] = [{
-      "id": 1,
-      "homeTeamId": 16,
-      "homeTeamGoals": 2,
-      "awayTeamId": 8,
-      "awayTeamGoals": 2,
-      "inProgress": true,
-    }] as Match[];
-    const responseLogin = await chai.request(app).post('/login').send(login);
-    expect(responseLogin.body.token).not.to.be.empty;
-    const token: string = responseLogin.body.token;
+    const token: string = await authenticate();
 
-    Sinon.stub(Model, 'findAll').resolves(outputMock);
-
+    Sinon.stub(Model, 'findAll').resolves(matchesInProgressList);
     const response = await chai.request(app).get('/matches?inProgress=true').set('authorization', token);
 
     expect(response.status).to.be.equal(200);
-    expect(response.body).to.be.deep.equal(outputMock);
+    expect(response.body).to.be.deep.equal(matchesInProgressList);
   });
 
   it('Metodo PATCH: Deve retornar 404 caso não encontre a partida para finalizar', async function() {
-    const login = { email: 'admin@admin.com', password: 'secret_admin'};
-    const outputMock = { message: 'Match not found'}
-    const responseLogin = await chai.request(app).post('/login').send(login);
-    expect(responseLogin.body.token).not.to.be.empty;
-    const token: string = responseLogin.body.token;
+    const token: string = await authenticate();
 
     Sinon.stub(Model, 'findOne').resolves(null);
-
     const response = await chai.request(app).patch('/matches/999/finish').set('authorization', token);
 
     expect(response.status).to.be.equal(404);
-    expect(response.body).to.be.deep.equal(outputMock);
+    expect(response.body).to.be.deep.equal(matchNotFound);
   });
 })
