@@ -28,8 +28,8 @@ Para adicionar uma partida, é necessário estar logado e possuir um token de au
 
 ## ⚙️ Instalação e Uso
 
-Você precisa do [node](https://nodejs.org/en/download/) para executar este projeto. Este projeto foi criado usando a versão `v16.15.1.`
-Você precisa do [docker](https://www.docker.com/products/docker-desktop/) e do [docker compose cli](https://www.docker.com/products/docker-desktop/) para executar este projeto. Este projeto foi criado usando as versões `v20.10` e `v1.29` respectivas.
+Você precisa ter o [node](https://nodejs.org/en/download/) instalado em seu computador para executar este projeto. Este projeto foi criado usando a versão `v16.15.1.`
+Você precisa ter o [docker](https://www.docker.com/products/docker-desktop/) e o [docker compose cli](https://www.docker.com/products/docker-desktop/) instalados em seu computador para executar este projeto. Este projeto foi criado usando as versões `v20.10` e `v1.29` respectivas.
 
 Para executar esta aplicação, você precisa fazer o clone para seu computador:
 
