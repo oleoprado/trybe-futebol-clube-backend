@@ -56,7 +56,14 @@ Rodar o script para subir o docker:
 npm run compose:up
 ```
 
-Para rodar a aplicação:
+
+Entrar no diretório `./app/backend`:
+
+```bash
+cd app/backend                
+```
+
+Para iniciar a aplicação, rodar dentro do diretório `app/backend`:
 
 ```bash
 npm run start
