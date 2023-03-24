@@ -1,6 +1,7 @@
 <!-- # :construction: README em construção ! :construction: -->
-<div align="center">
-<img src=".github/cover.jpg" />
+<div align="center" display="flex">
+<img src=".github/tfc-classificacao.png" width="500px"/>
+<img src=".github/tfc-partidas.png" width="500px" height="359px"/>
 
 </div>
 <div align="center">
