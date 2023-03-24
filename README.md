@@ -49,16 +49,16 @@ Instalar as depedências:
 npm install
 ```
 
-Rodar o script para subir o docker:
+Rodar o script para subir o container:
 
 ```bash
 npm run compose:up
 ```
 
-Para rodar a aplicação:
+Rodar o script para descer o container:
 
 ```bash
-npm run start
+npm run compose:down
 ```
 
 A aplicação estará acessível:
